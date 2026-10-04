@@ -6,27 +6,43 @@ require_once "database.php";
 
 try {
 
-    $sql = "SELECT id, word, definition, difficulty
+    $difficulty = $_GET["difficulty"] ?? "";
+
+    $previous = $_GET["previous"] ?? "";
+
+    $sql = "SELECT id, word, definition, hint, difficulty
             FROM words
+            WHERE difficulty = :difficulty
+            AND word != :previous
             ORDER BY RAND()
             LIMIT 1";
 
-    $stmt = $pdo->query($sql);
+    $stmt = $pdo->prepare($sql);
+
+    $stmt->execute([
+        ":difficulty" => $difficulty,
+        ":previous" => $previous
+    ]);
 
     $word = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($word) {
+
         echo json_encode([
             "success" => true,
             "word" => $word["word"],
             "definition" => $word["definition"],
+            "hint" => $word["hint"],
             "difficulty" => $word["difficulty"]
         ]);
+
     } else {
+
         echo json_encode([
             "success" => false,
-            "message" => "No words found in the database."
+            "message" => "No words found for this difficulty."
         ]);
+
     }
 
 } catch (PDOException $e) {
@@ -35,4 +51,5 @@ try {
         "success" => false,
         "message" => $e->getMessage()
     ]);
+
 }

@@ -1,14 +1,21 @@
 let secretWord = "";
 let definition = "";
+let hint = "";
+let selectedDifficulty = "";
 let difficulty = "";
 
-let guessedLetters = [];
 let lives = 3;
 let score = 0;
+let wrongAttempts = 0;
+
+let wordsSolved = Number(localStorage.getItem("wordsSolved")) || 0;
+let highestScore = Number(localStorage.getItem("highestScore")) || 0;
+
+const highestScoreDisplay = document.querySelector("#highestScore");
+const wordsSolvedDisplay = document.querySelector("#wordsSolved");
 
 const introduction = document.querySelector(".introduction");
 const game = document.querySelector(".game");
-const startGameButton = document.querySelector(".start-game");
 
 const wordDisplay = document.querySelector(".word");
 const hintDisplay = document.querySelector(".hint");
@@ -16,61 +23,125 @@ const hintDisplay = document.querySelector(".hint");
 const scoreDisplay = document.querySelector("#score");
 const livesDisplay = document.querySelector("#lives");
 
-const guessInput = document.querySelector("#guessInput");
-const guessButton = document.querySelector("#guessButton");
+const answerInput = document.querySelector("#answerInput");
+const submitAnswerButton = document.querySelector("#submitAnswer");
+const hintButton = document.querySelector("#hintButton");
+const hintPopup = document.querySelector("#hintPopup");
+const hintText = document.querySelector("#hintText");
+const closeHint = document.querySelector("#closeHint");
 
-const newGameButton = document.querySelector(".new-game");
+const backMenu = document.querySelector("#backMenu");
+const exitPopup = document.querySelector("#exitPopup");
+const cancelExit = document.querySelector("#cancelExit");
+const confirmExit = document.querySelector("#confirmExit");
+
+const difficultyButtons = document.querySelectorAll(".difficulty-button");
+
+const scoreStat = document.querySelector("#scoreStat");
+const livesStat = document.querySelector("#livesStat");
+
+const gameOver = document.querySelector("#gameOver");
+const gameOverMenu = document.querySelector("#gameOverMenu");
+
+const finalScore = document.querySelector("#finalScore");
+const finalWordsSolved = document.querySelector("#finalWordsSolved");
+const finalHighestScore = document.querySelector("#finalHighestScore");
 
 /* =========================
-   START GAME
+DIFFICULTY / START GAME
 ========================= */
 
-startGameButton.addEventListener("click", function () {
-  introduction.style.display = "none";
-  game.style.display = "block";
+difficultyButtons.forEach(function (button) {
+  button.addEventListener("click", function () {
+    selectedDifficulty = button.dataset.difficulty;
 
-  startNewRound();
+    console.log("Selected difficulty:", selectedDifficulty);
+
+    // Reset current game
+    score = 0;
+    lives = 3;
+    wrongAttempts = 0;
+    secretWord = "";
+
+    introduction.style.display = "none";
+    game.style.display = "block";
+
+    scoreStat.style.display = "block";
+    livesStat.style.display = "block";
+
+    updateScore();
+    updateLives();
+
+    startNewRound();
+  });
 });
 
 /* =========================
-   GET RANDOM WORD
+GET RANDOM WORD
 ========================= */
 
 async function startNewRound() {
-  lives = 3;
-  guessedLetters = [];
+  wrongAttempts = 0;
 
   updateLives();
   updateScore();
 
-  wordDisplay.innerHTML = "";
+  wordDisplay.textContent = "TYPE YOUR ANSWER BELOW";
 
   hintDisplay.innerHTML = "Loading definition...";
 
-  guessInput.value = "";
-  guessInput.disabled = false;
-  guessButton.disabled = false;
+  answerInput.value = "";
+  answerInput.disabled = false;
+
+  submitAnswerButton.disabled = false;
+
+  hintPopup.style.display = "none";
 
   try {
-    const response = await fetch("get_word.php");
+    /*
+     * Send the previous word and selected
+     * difficulty to PHP.
+     */
 
-    const data = await response.json();
+    const response = await fetch(
+      "get_word.php?previous=" +
+        encodeURIComponent(secretWord) +
+        "&difficulty=" +
+        encodeURIComponent(selectedDifficulty),
+    );
+
+    const text = await response.text();
+
+    console.log("SERVER RESPONSE:");
+    console.log(text);
+
+    const data = JSON.parse(text);
 
     if (!data.success) {
       hintDisplay.textContent = "Could not load a word.";
-      console.error(data.message);
+
+      console.error("PHP ERROR:", data.message);
+
       return;
     }
 
+    console.log("New word loaded:", data.word);
+
     secretWord = data.word.toUpperCase();
+
     definition = data.definition;
+
+    hint = data.hint;
+
     difficulty = data.difficulty;
 
     hintDisplay.innerHTML = `<strong>DEFINITION:</strong> ${definition}
-             <br>
-             <span class="difficulty">Difficulty: ${difficulty}</span>`;
+        <br>
+        <span class="difficulty">
+            Difficulty: ${difficulty}
+        </span>`;
 
-    displayWord();
+    answerInput.focus();
   } catch (error) {
     console.error(error);
 
@@ -79,139 +150,198 @@ async function startNewRound() {
 }
 
 /* =========================
-   DISPLAY HIDDEN WORD
+AUTOMATIC UPPERCASE
 ========================= */
 
-function displayWord() {
-  wordDisplay.innerHTML = "";
-
-  for (let letter of secretWord) {
-    const letterSpan = document.createElement("span");
-
-    if (guessedLetters.includes(letter)) {
-      letterSpan.textContent = letter;
-    } else {
-      letterSpan.textContent = "_";
-    }
-
-    wordDisplay.appendChild(letterSpan);
-  }
-}
+answerInput.addEventListener("input", function () {
+  answerInput.value = answerInput.value.toUpperCase();
+});
 
 /* =========================
-   GUESS LETTER
+SUBMIT ANSWER
 ========================= */
 
-guessButton.addEventListener("click", makeGuess);
+submitAnswerButton.addEventListener("click", checkAnswer);
 
-guessInput.addEventListener("keydown", function (event) {
+answerInput.addEventListener("keydown", function (event) {
   if (event.key === "Enter") {
-    makeGuess();
+    event.preventDefault();
+    checkAnswer();
   }
 });
 
-function makeGuess() {
-  const letter = guessInput.value.trim().toUpperCase();
+/* =========================
+CHECK ANSWER
+========================= */
 
-  guessInput.value = "";
+function checkAnswer() {
+  const playerAnswer = answerInput.value.trim().toUpperCase();
 
-  if (letter.length !== 1 || !/^[A-Z]$/.test(letter)) {
-    alert("Please enter one letter.");
-
-    return;
-  }
-
-  if (guessedLetters.includes(letter)) {
-    alert("You already guessed that letter.");
+  if (playerAnswer === "") {
+    alert("Please enter your answer.");
 
     return;
   }
 
-  guessedLetters.push(letter);
-
-  if (secretWord.includes(letter)) {
-    score += 10;
-
-    updateScore();
-
-    displayWord();
-
-    if (hasWon()) {
-      winGame();
-    }
+  if (playerAnswer === secretWord) {
+    winGame();
   } else {
+    wrongAttempts++;
+
     lives--;
 
     updateLives();
 
+    answerInput.value = "";
+
+    answerInput.focus();
+
     if (lives <= 0) {
       loseGame();
+    } else {
+      hintDisplay.innerHTML = `
+        <strong>DEFINITION:</strong> ${definition}
+        <br>
+        <span class="difficulty">
+          Difficulty: ${difficulty}
+        </span>
+        <br><br>
+        <strong>Not quite!</strong>
+        Try again. You have ${lives} ${lives === 1 ? "life" : "lives"} left.
+      `;
     }
   }
 }
 
 /* =========================
-   CHECK WIN
+HINT
+========================= */
+hintButton.addEventListener("click", function () {
+  if (!secretWord) {
+    return;
+  }
+
+  hintText.textContent = hint || "No hint is available for this word.";
+
+  hintPopup.style.display = "flex";
+});
+
+/* =========================
+CLOSE HINT
 ========================= */
 
-function hasWon() {
-  for (let letter of secretWord) {
-    if (!guessedLetters.includes(letter)) {
-      return false;
-    }
-  }
-
-  return true;
-}
+closeHint.addEventListener("click", function () {
+  hintPopup.style.display = "none";
+});
 
 /* =========================
-   WIN
+WIN
 ========================= */
 
 function winGame() {
-  wordDisplay.innerHTML = "";
+  let points = 100;
 
-  for (let letter of secretWord) {
-    const letterSpan = document.createElement("span");
-
-    letterSpan.textContent = letter;
-
-    wordDisplay.appendChild(letterSpan);
+  if (wrongAttempts === 1) {
+    points = 75;
+  } else if (wrongAttempts === 2) {
+    points = 50;
   }
 
-  hintDisplay.innerHTML = `🎉 <strong>Correct!</strong> The word was ${secretWord}.`;
+  score += points;
+  wordsSolved++;
 
-  guessInput.disabled = true;
-  guessButton.disabled = true;
+  if (score > highestScore) {
+    highestScore = score;
+  }
 
-  score += 50;
+  localStorage.setItem("highestScore", highestScore);
+  localStorage.setItem("wordsSolved", wordsSolved);
 
   updateScore();
+  updateRecords();
+
+  wordDisplay.textContent = secretWord;
+
+  hintDisplay.innerHTML = `🎉 <strong>Correct!</strong>
+        You earned ${points} points.`;
+
+  answerInput.disabled = true;
+  submitAnswerButton.disabled = true;
+
+  setTimeout(function () {
+    startNewRound();
+  }, 1000);
 }
 
 /* =========================
-   LOSE
+LOSE
 ========================= */
 
 function loseGame() {
-  wordDisplay.innerHTML = "";
+  game.style.display = "none";
+  gameOver.style.display = "block";
 
-  for (let letter of secretWord) {
-    const letterSpan = document.createElement("span");
+  finalScore.textContent = score;
+  finalWordsSolved.textContent = wordsSolved;
+  finalHighestScore.textContent = highestScore;
 
-    letterSpan.textContent = letter;
-
-    wordDisplay.appendChild(letterSpan);
-  }
-
-  hintDisplay.innerHTML = `😢 <strong>Game Over!</strong> The word was ${secretWord}.`;
-
-  guessInput.disabled = true;
-  guessButton.disabled = true;
+  scoreStat.style.display = "none";
+  livesStat.style.display = "none";
 }
 
 /* =========================
-   UPDATE LIVES
+BACK TO MENU
+========================= */
+gameOverMenu.addEventListener("click", function () {
+  gameOver.style.display = "none";
+  introduction.style.display = "block";
+
+  score = 0;
+  lives = 3;
+  wrongAttempts = 0;
+
+  updateScore();
+  updateLives();
+  updateRecords();
+});
+
+function updateRecords() {
+  highestScoreDisplay.textContent = highestScore;
+  wordsSolvedDisplay.textContent = wordsSolved;
+}
+
+/* =========================
+EXIT GAME POPUP
+========================= */
+
+backMenu.addEventListener("click", function () {
+  exitPopup.style.display = "flex";
+});
+
+cancelExit.addEventListener("click", function () {
+  exitPopup.style.display = "none";
+});
+
+confirmExit.addEventListener("click", function () {
+  exitPopup.style.display = "none";
+
+  game.style.display = "none";
+  introduction.style.display = "block";
+
+  score = 0;
+  lives = 3;
+  wrongAttempts = 0;
+  secretWord = "";
+
+  scoreStat.style.display = "none";
+  livesStat.style.display = "none";
+
+  updateScore();
+  updateLives();
+});
+
+/* =========================
+UPDATE LIVES
 ========================= */
 
 function updateLives() {
@@ -225,17 +355,11 @@ function updateLives() {
 }
 
 /* =========================
-   UPDATE SCORE
+UPDATE SCORE
 ========================= */
 
 function updateScore() {
   scoreDisplay.textContent = score;
 }
 
-/* =========================
-   NEW GAME
-========================= */
-
-newGameButton.addEventListener("click", function () {
-  startNewRound();
-});
+updateRecords();

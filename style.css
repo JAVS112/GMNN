@@ -99,13 +99,19 @@ HEADER
   color: var(--primary-light);
 }
 
+
 /* =========================================
 GAME STATS
 ========================================= */
 
+#scoreStat {
+  margin-left: auto;
+  margin-right: 30px;
+}
+
 .game-stats {
   display: flex;
-  gap: 30px;
+  gap: 18px;
 }
 
 .stat {
@@ -298,47 +304,6 @@ INTRODUCTION SCREEN
   color: var(--text);
 }
 
-/* Start button */
-
-.start-game {
-  margin-top: 35px;
-
-  padding: 15px 42px;
-
-  border: none;
-  border-radius: 12px;
-
-  background: linear-gradient(135deg, var(--primary), var(--primary-light));
-
-  color: white;
-
-  font-size: 14px;
-  font-weight: 800;
-
-  letter-spacing: 1px;
-
-  cursor: pointer;
-
-  position: relative;
-  z-index: 2;
-
-  box-shadow: 0 10px 25px rgba(124, 92, 255, 0.3);
-
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-}
-
-.start-game:hover {
-  transform: translateY(-3px);
-
-  box-shadow: 0 15px 35px rgba(124, 92, 255, 0.45);
-}
-
-.start-game:active {
-  transform: translateY(0) scale(0.97);
-}
-
 /* =========================================
 WORD AREA
 ========================================= */
@@ -351,44 +316,16 @@ WORD AREA
   position: relative;
   z-index: 2;
 }
-
 .word {
-  display: flex;
-  justify-content: center;
+  text-align: center;
 
-  gap: 12px;
+  color: var(--text-muted);
 
-  flex-wrap: wrap;
+  font-size: 14px;
+
+  font-weight: 600;
 }
 
-.word span {
-  width: 48px;
-  height: 60px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border-bottom: 3px solid var(--primary);
-
-  color: white;
-
-  font-size: 28px;
-  font-weight: 800;
-
-  transition:
-    transform 0.25s ease,
-    color 0.25s ease,
-    border-color 0.25s ease;
-}
-
-.word span:hover {
-  transform: translateY(-5px);
-
-  border-color: var(--secondary);
-
-  color: var(--secondary);
-}
 
 .hint {
   margin-top: 28px;
@@ -448,45 +385,6 @@ GUESS AREA
 }
 
 /* =========================================
-NEW GAME BUTTON
-========================================= */
-
-.new-game {
-  display: block;
-  margin: 30px auto 0;
-
-  padding: 10px 20px;
-
-  border: 1px solid var(--border);
-
-  border-radius: 10px;
-
-  background: transparent;
-
-  color: var(--text-muted);
-
-  font-size: 12px;
-  font-weight: 700;
-
-  cursor: pointer;
-
-  position: relative;
-  z-index: 2;
-
-  transition:
-    color 0.2s ease,
-    border-color 0.2s ease,
-    background 0.2s ease;
-}
-
-.new-game:hover {
-  color: white;
-  border-color: var(--primary);
-
-  background: rgba(124, 92, 255, 0.1);
-}
-
-/* =========================================
 FOOTER
 ========================================= */
 
@@ -519,6 +417,505 @@ ANIMATIONS
   }
 }
 
+.exit-popup {
+    display: none;
+    position: fixed;
+    inset: 0;
+
+    background: rgba(0, 0, 0, 0.6);
+
+    justify-content: center;
+    align-items: center;
+
+    z-index: 1000;
+}
+
+.exit-popup-content {
+    width: 90%;
+    max-width: 420px;
+
+    padding: 30px;
+
+    background: white;
+    border-radius: 16px;
+    color: black;
+    text-align: center;
+}
+
+.exit-popup-content h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+.exit-popup-content p {
+    margin-bottom: 10px;
+}
+
+.exit-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+
+    margin-top: 25px;
+}
+
+.exit-buttons button {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+
+    cursor: pointer;
+    font-weight: bold;
+}
+
+#cancelExit {
+    background: #ddd;
+}
+
+#confirmExit {
+    background: #d9534f;
+    color: white;
+}
+
+/* =========================
+   HINT POPUP
+========================= */
+
+.hint-popup {
+  display: none;
+
+  position: fixed;
+  inset: 0;
+
+  background: rgba(0, 0, 0, 0.45);
+
+  justify-content: center;
+  align-items: center;
+
+  z-index: 1000;
+}
+
+.hint-popup-content {
+  position: relative;
+
+  width: 300px;
+  padding: 25px;
+
+  background: white;
+  border-radius: 15px;
+
+  text-align: center;
+
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+.hint-popup-content h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+.hint-popup-content p {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.close-hint {
+  position: absolute;
+
+  top: 8px;
+  right: 12px;
+
+  border: none;
+  background: none;
+
+  font-size: 24px;
+  cursor: pointer;
+}
+
+/* Force Hint Popup text to be visible */
+
+.hint-popup-content,
+.hint-popup-content h3,
+.hint-popup-content p,
+.hint-popup-content .close-hint {
+    color: #222 !important;
+}
+
+.hint-popup-content p {
+    color: #333 !important;
+    font-size: 16px;
+    font-weight: 500;
+}
+.close-hint {
+    color: #222 !important;
+}
+/* =========================================
+   CHALLENGE LEVELS
+========================================= */
+
+.challenge-section {
+  margin-top: 40px;
+
+  position: relative;
+  z-index: 2;
+}
+
+.challenge-section h2,
+.record-section h2 {
+  margin-bottom: 20px;
+
+  font-size: 13px;
+  font-weight: 800;
+
+  letter-spacing: 2px;
+
+  color: var(--text-muted);
+}
+
+
+/* Difficulty buttons */
+
+.difficulty-buttons {
+  display: grid;
+
+  grid-template-columns: repeat(3, 1fr);
+
+  gap: 15px;
+}
+
+.difficulty-button {
+  min-height: 110px;
+
+  padding: 20px 15px;
+
+  border: 1px solid var(--border);
+
+  border-radius: 16px;
+
+  background: rgba(255, 255, 255, 0.03);
+
+  color: white;
+
+  cursor: pointer;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.difficulty-button strong {
+  font-size: 17px;
+
+  letter-spacing: 1px;
+}
+
+.difficulty-button span {
+  font-size: 11px;
+
+  color: var(--text-muted);
+
+  line-height: 1.4;
+}
+
+
+/* Easy */
+
+.difficulty-button.easy:hover {
+  transform: translateY(-4px);
+
+  border-color: var(--success);
+
+  background: rgba(62, 229, 138, 0.08);
+
+  box-shadow: 0 10px 30px rgba(62, 229, 138, 0.12);
+}
+
+
+/* Medium */
+
+.difficulty-button.medium:hover {
+  transform: translateY(-4px);
+
+  border-color: var(--secondary);
+
+  background: rgba(39, 217, 255, 0.08);
+
+  box-shadow: 0 10px 30px rgba(39, 217, 255, 0.12);
+}
+
+
+/* Hard */
+
+.difficulty-button.hard:hover {
+  transform: translateY(-4px);
+
+  border-color: var(--danger);
+
+  background: rgba(255, 85, 119, 0.08);
+
+  box-shadow: 0 10px 30px rgba(255, 85, 119, 0.12);
+}
+
+.difficulty-button:active {
+  transform: scale(0.97);
+}
+
+
+/* =========================================
+   RECORD SECTION
+========================================= */
+
+.record-section {
+  margin-top: 40px;
+
+  padding-top: 30px;
+
+  border-top: 1px solid var(--border);
+
+  position: relative;
+  z-index: 2;
+}
+
+.record-stats {
+  display: grid;
+
+  grid-template-columns: repeat(2, 1fr);
+
+  gap: 15px;
+}
+
+.record-stat {
+  padding: 18px;
+
+  border: 1px solid var(--border);
+
+  border-radius: 14px;
+
+  background: rgba(255, 255, 255, 0.03);
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 7px;
+}
+
+.record-label {
+  font-size: 10px;
+
+  font-weight: 700;
+
+  letter-spacing: 1.5px;
+
+  color: var(--text-muted);
+}
+
+.record-value {
+  font-size: 26px;
+
+  font-weight: 800;
+
+  color: var(--primary-light);
+}
+
+
+/* =========================================
+   ANSWER INPUT
+========================================= */
+
+.answer-input {
+  width: 100%;
+
+  max-width: 500px;
+
+  margin: 25px auto 0;
+
+  display: block;
+
+  background: transparent;
+
+  border: none;
+
+  border-bottom: 2px solid var(--primary);
+
+  outline: none;
+
+  padding: 10px 5px;
+
+  color: white;
+
+  font-size: 24px;
+
+  font-weight: 800;
+
+  text-align: center;
+
+  text-transform: uppercase;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.answer-input::placeholder {
+  color: var(--text-muted);
+
+  opacity: 0.6;
+}
+
+.answer-input:focus {
+  border-bottom-color: var(--secondary);
+
+  box-shadow: 0 8px 20px rgba(39, 217, 255, 0.08);
+}
+
+
+/* =========================================
+   HINT BUTTON
+========================================= */
+
+.hint-button {
+  margin-left: 12px;
+
+  padding: 14px 25px;
+
+  border: 1px solid var(--border);
+
+  border-radius: 12px;
+
+  background: transparent;
+
+  color: var(--text-muted);
+
+  font-size: 13px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.hint-button:hover {
+  color: white;
+
+  border-color: var(--secondary);
+
+  background: rgba(39, 217, 255, 0.08);
+}
+
+
+/* =========================================
+   BACK TO MENU
+========================================= */
+
+.back-menu {
+  display: block;
+
+  margin: 15px auto 0;
+
+  padding: 10px 20px;
+
+  border: 1px solid var(--border);
+
+  border-radius: 10px;
+
+  background: transparent;
+
+  color: var(--text-muted);
+
+  font-size: 12px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  position: relative;
+
+  z-index: 2;
+
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.back-menu:hover {
+  color: white;
+
+  border-color: var(--primary);
+
+  background: rgba(124, 92, 255, 0.1);
+}
+
+
+/* =========================================
+   GAME OVER
+========================================= */
+
+.game-over {
+  text-align: center;
+}
+
+.final-results {
+  margin: 40px auto 0;
+
+  max-width: 500px;
+
+  display: grid;
+
+  grid-template-columns: repeat(3, 1fr);
+
+  gap: 15px;
+
+  position: relative;
+
+  z-index: 2;
+}
+
+.final-stat {
+  padding: 22px 15px;
+
+  border: 1px solid var(--border);
+
+  border-radius: 15px;
+
+  background: rgba(255, 255, 255, 0.03);
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 8px;
+}
+
+.final-stat span {
+  font-size: 9px;
+
+  font-weight: 700;
+
+  letter-spacing: 1px;
+
+  color: var(--text-muted);
+}
+
+.final-stat strong {
+  font-size: 25px;
+
+  color: var(--primary-light);
+}
+
 /* =========================================
 MOBILE
 ========================================= */
@@ -533,7 +930,7 @@ MOBILE
   }
 
   .game-stats {
-    gap: 15px;
+    gap: 10px;
   }
 
   .stat-value {
@@ -573,9 +970,6 @@ MOBILE
     margin-top: 30px;
   }
 
-  .start-game {
-    width: 100%;
-  }
 }
 
 /* =========================================
@@ -598,4 +992,64 @@ VERY SMALL SCREENS
 
     font-size: 20px;
   }
+}
+
+
+
+
+/* =========================================
+   MOBILE LEVELS
+========================================= */
+
+@media (max-width: 600px) {
+
+  .difficulty-buttons {
+    grid-template-columns: 1fr;
+  }
+
+  .difficulty-button {
+    min-height: 85px;
+  }
+
+  .record-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .final-results {
+    grid-template-columns: 1fr;
+  }
+
+  .answer-input {
+    font-size: 20px;
+  }
+
+  .guess-area {
+    flex-direction: column;
+
+    align-items: center;
+
+    gap: 12px;
+  }
+
+  .hint-button {
+    margin-left: 0;
+  }
+
+}
+
+
+/* =========================================
+   SMALL MOBILE
+========================================= */
+
+@media (max-width: 380px) {
+
+  .difficulty-button strong {
+    font-size: 15px;
+  }
+
+  .difficulty-button span {
+    font-size: 10px;
+  }
+
 }
