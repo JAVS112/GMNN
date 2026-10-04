@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Word Guess</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            WORD<span>GUESS</span>
+        </div>
+
+        <div class="game-stats">
+            <div class="stat">
+                <span class="stat-label">SCORE</span>
+                <span class="stat-value">120</span>
+            </div>
+
+            <div class="stat">
+                <span class="stat-label">LIVES</span>
+                <span class="stat-value lives">♥ ♥ ♥</span>
+            </div>
+        </div>
+    </header>
+
+
+    <!-- Main Game -->
+    <main class="game-container">
+
+        <section class="game-card">
+
+            <!-- Game Title -->
+            <div class="game-heading">
+                <p class="small-title">CAN YOU FIGURE IT OUT?</p>
+                <h1>GUESS THE WORD</h1>
+                <p class="description">
+                    Guess the hidden word before you run out of lives.
+                </p>
+            </div>
+
+
+            <!-- Word -->
+            <div class="word-area">
+                <div class="word">
+                    <span>_</span>
+                    <span>_</span>
+                    <span>_</span>
+                    <span>_</span>
+                    <span>_</span>
+                    <span>_</span>
+                </div>
+
+                <p class="hint">
+                    💡 Hint: <strong>An animal</strong>
+                </p>
+            </div>
+
+
+            <!-- Guess Input -->
+            <div class="guess-area">
+                <button class="guess-button">
+                    GUESS
+                </button>
+            </div>
+
+            <!-- New Game -->
+            <button class="new-game">
+                ↻ &nbsp; NEW GAME
+            </button>
+
+        </section>
+
+    </main>
+
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>© <?php echo date("Y"); ?> WordGuess. Have fun!</p>
+    </footer>
+
+</body>
+</html>
